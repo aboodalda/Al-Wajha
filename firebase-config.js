@@ -1,5 +1,5 @@
 export const firebaseConfig = {
-  apiKey: "AIzaSyDtYSLUMMPovbUBJfDtLfMs6TESUm_xmAA",
+  apiKey: "AIzaSyDtYSLUMMPovbuBJfDtLfMs6TESUm_xMaA",
   authDomain: "al-wajha-menu.firebaseapp.com",
   projectId: "al-wajha-menu",
   storageBucket: "al-wajha-menu.firebasestorage.app",
