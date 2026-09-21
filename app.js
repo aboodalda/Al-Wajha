@@ -2,14 +2,40 @@ import{initializeApp}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-app
 import{getFirestore,collection,getDocs,doc,getDoc,query,orderBy}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 import{firebaseConfig}from"./firebase-config.js?v=3";
 const app=initializeApp(firebaseConfig),db=getFirestore(app),$=id=>document.getElementById(id);
-const state={categories:[],products:[],active:"all"};
+const state={categories:[],products:[],active:"all",search:"",lang:"ar",site:{}};
+
 async function load(){try{
-const s=await getDoc(doc(db,"settings","site"));const site=s.exists()?s.data():{};applySite(site);
+const s=await getDoc(doc(db,"settings","site"));state.site=s.exists()?s.data():{};applySite(state.site);
 const cs=await getDocs(query(collection(db,"categories"),orderBy("order","asc")));state.categories=cs.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.visible!==false);
 const ps=await getDocs(query(collection(db,"products"),orderBy("order","asc")));state.products=ps.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.visible!==false);
-renderCats();renderProducts()}catch(e){console.error(e);$("emptyState").textContent="تعذر تحميل المنيو. تأكد من إعدادات Firebase."; $("emptyState").classList.remove("hidden")}finally{$("loading").style.display="none"}}
-function applySite(s){const n=s.name||"الواجهة البحرية";$("restaurantName").textContent=n;$("brandMark").textContent=n;$("footerName").textContent=n;$("restaurantTagline").textContent=s.tagline||"تجربة طعام استثنائية على البحر";$("footerDescription").textContent=s.tagline||"";$("year").textContent=new Date().getFullYear();if(s.heroImage){$("restaurantName").closest(".hero").style.backgroundImage=`linear-gradient(180deg,rgba(7,24,39,.25),rgba(7,24,39,.96)),url("${s.heroImage}")`;$("restaurantName").closest(".hero").style.backgroundSize="cover";$("restaurantName").closest(".hero").style.backgroundPosition="center"}if(s.phone){$("phoneLink").textContent=s.phone;$("phoneLink").href="tel:"+s.phone.replace(/\s/g,"");$("phoneLink").classList.remove("hidden")}if(s.instagram){$("instagramLink").href=s.instagram;$("instagramLink").classList.remove("hidden")}if(s.location){$("locationLink").href=s.location;$("locationLink").classList.remove("hidden")}}
-function renderCats(){const w=$("categories");w.innerHTML="";const all=document.createElement("button");all.className="category-tab active";all.textContent="الكل";all.onclick=()=>{state.active="all";active(all);renderProducts()};w.appendChild(all);state.categories.forEach(c=>{const b=document.createElement("button");b.className="category-tab";b.textContent=c.name;b.onclick=()=>{state.active=c.id;active(b);renderProducts()};w.appendChild(b)})}
+renderCats();renderProducts();
+}catch(e){console.error(e);$("emptyState").textContent="تعذر تحميل المنيو. تأكد من إعدادات Firebase.";$("emptyState").classList.remove("hidden")}finally{$("loading").style.display="none"}}
+
+function applySite(s){const n=s.name||"الواجهة البحرية",ne=s.nameEn||"AL WAJHA AL BAHRIYA",tag=s.tagline||"في الواجهة البحرية، نصنع من الطعام تجربة، ومن كل زيارة ذكرى.";
+$("restaurantName").textContent=n;$("restaurantNameEn").textContent=ne;$("brandMark").textContent=n;$("footerName").textContent=n;$("restaurantTagline").textContent=tag;$("footerDescription").textContent=tag;$("year").textContent=new Date().getFullYear();
+if(s.heroImage){const h=document.querySelector(".hero");h.style.backgroundImage=`linear-gradient(90deg,rgba(4,17,28,.94) 0%,rgba(4,17,28,.62) 43%,rgba(4,17,28,.18) 100%),linear-gradient(180deg,rgba(4,17,28,.1),rgba(4,17,28,.84)),url("${esc(s.heroImage)}")`;h.classList.add("has-image")}
+if(s.phone){$("phoneLink").textContent=s.phone;$("phoneLink").href="tel:"+s.phone.replace(/\s/g,"");$("phoneLink").classList.remove("hidden")}if(s.instagram){$("instagramLink").href=s.instagram;$("instagramLink").classList.remove("hidden")}if(s.location){$("locationLink").href=s.location;$("locationLink").classList.remove("hidden")}}
+
+function renderCats(){const w=$("categories");w.innerHTML="";
+const all=document.createElement("button");all.className="category-tab active";all.innerHTML='<span class="cat-icon">✦</span><span class="cat-name">'+(state.lang==="ar"?"الكل":"All")+"</span>";all.onclick=()=>{state.active="all";active(all);renderProducts()};w.appendChild(all);
+state.categories.forEach(c=>{const b=document.createElement("button");b.className="category-tab";b.innerHTML=`<span class="cat-icon">${esc(c.icon||"◈")}</span><span class="cat-name">${esc(state.lang==="ar"?(c.name||"قسم"):(c.nameEn||c.name||"Category"))}</span>`;b.onclick=()=>{state.active=c.id;active(b);renderProducts()};w.appendChild(b)})}
 function active(b){document.querySelectorAll(".category-tab").forEach(x=>x.classList.remove("active"));b.classList.add("active")}
-function renderProducts(){const w=$("products");w.innerHTML="";const list=state.products.filter(p=>state.active==="all"||p.categoryId===state.active);$("emptyState").classList.toggle("hidden",!!list.length);list.forEach(p=>{const c=document.createElement("article");c.className="product-card";c.innerHTML=`<div class="product-image">${p.imageUrl?`<img loading="lazy" src="${esc(p.imageUrl)}" alt="${esc(p.name||"")}">`:`<div class="image-placeholder">صورة المنتج</div>`}</div><div class="product-body">${p.badge?`<span class="badge">${esc(p.badge)}</span>`:""}<h3 class="product-name">${esc(p.name||"منتج")}</h3><p class="product-desc">${esc(p.description||"")}</p><div class="product-bottom"><span class="price">${Number(p.price||0).toLocaleString("ar-SA")} <span class="currency">ر.س</span></span></div></div>`;w.appendChild(c)})}
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}load();
+
+function renderProducts(){const w=$("products");w.innerHTML="";
+let list=state.products.filter(p=>state.active==="all"||p.categoryId===state.active);
+const q=state.search.trim().toLowerCase();
+if(q)list=list.filter(p=>[p.name,p.nameEn,p.description,p.descriptionEn].concat(state.categories.filter(c=>c.id===p.categoryId).map(c=>c.name+" "+(c.nameEn||""))).join(" ").toLowerCase().includes(q));
+$("emptyState").classList.toggle("hidden",!!list.length);
+list.forEach((p,i)=>{const name=state.lang==="ar"?(p.name||"منتج"):(p.nameEn||p.name||"Product"),desc=state.lang==="ar"?(p.description||""):(p.descriptionEn||p.description||"");const badge=p.badge||"";
+const c=document.createElement("article");c.className="product-card";c.style.setProperty("--delay",Math.min(i,8)*55+"ms");
+c.innerHTML=`<div class="product-image">${p.imageUrl?`<img loading="lazy" src="${esc(p.imageUrl)}" alt="${esc(name)}">`:`<div class="image-placeholder">صورة المنتج</div>`}${badge?`<span class="badge ${badgeClass(badge)}">${esc(badge)}</span>`:""}</div><div class="product-body"><h3 class="product-name">${esc(name)}</h3><p class="product-en">${esc(state.lang==="ar"?(p.nameEn||""):(p.name||""))}</p><p class="product-desc">${esc(desc)}</p><div class="product-bottom"><span class="price">${Number(p.price||0).toLocaleString(state.lang==="ar"?"ar-SA":"en-US")} <span class="currency">ر.س</span></span><span class="dish-plus">+</span></div></div>`;
+w.appendChild(c)})}
+
+function badgeClass(b){const x=String(b).toLowerCase();return x.includes("جديد")||x.includes("new")?"badge-new":x.includes("طلب")||x.includes("popular")?"badge-popular":"badge-special"}
+function setLang(lang){state.lang=lang;document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";$("langAr").classList.toggle("active",lang==="ar");$("langEn").classList.toggle("active",lang==="en");$("heroWelcome").textContent=lang==="ar"?"WELCOME TO":"WELCOME TO";$("exploreButton").innerHTML=lang==="ar"?'استكشف القائمة <span>↓</span>':'Explore Menu <span>↓</span>';$("menuTitle").textContent=lang==="ar"?"قائمة الطعام":"Our Menu";$("menuDescription").textContent=lang==="ar"?"اختر قسمك واستمتع بتجربة مميزة.":"Choose a category and enjoy a special experience.";$("featuredTitle").textContent=lang==="ar"?"أطباق مميزة":"Featured Dishes";$("featured-en").textContent="FEATURED DISHES";$("showAll").textContent=lang==="ar"?"عرض الكل →":"View All →";$("menuSearch").placeholder=lang==="ar"?"ابحث عن طبق، مشروب أو صنف...":"Search for a dish, drink or category...";renderCats();renderProducts()}
+$("langAr").onclick=()=>setLang("ar");$("langEn").onclick=()=>setLang("en");
+$("menuSearch").addEventListener("input",e=>{state.search=e.target.value;$("clearSearch").classList.toggle("hidden",!state.search);renderProducts()});
+$("clearSearch").onclick=()=>{$("menuSearch").value="";state.search="";$("clearSearch").classList.add("hidden");renderProducts()};
+$("showAll").onclick=()=>{state.active="all";state.search="";$("menuSearch").value="";$("clearSearch").classList.add("hidden");renderCats();renderProducts();document.getElementById("products").scrollIntoView({behavior:"smooth",block:"start"})};
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+load();
