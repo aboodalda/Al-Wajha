@@ -1,6 +1,6 @@
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 import{getFirestore,collection,getDocs,doc,getDoc,query,orderBy}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-import{firebaseConfig}from"./firebase-config.js";
+import{firebaseConfig}from"./firebase-config.js?v=3";
 const app=initializeApp(firebaseConfig),db=getFirestore(app),$=id=>document.getElementById(id);
 const state={categories:[],products:[],active:"all"};
 async function load(){try{
