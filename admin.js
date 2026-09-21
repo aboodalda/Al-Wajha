@@ -2,6 +2,24 @@ import{initializeApp}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-app
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);let categories=[],products=[];
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginMessage").textContent="جارٍ تسجيل الدخول...";try{await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value)}catch(x){$("loginMessage").textContent=errMsg(x)}};
 $("logoutBtn").onclick=()=>signOut(auth);
+const CLOUDINARY_CLOUD_NAME="heqkzarp",CLOUDINARY_UPLOAD_PRESET="alwajha";
+let cloudinaryWidget=null;
+function openCloudinaryUpload(targetId){
+if(!window.cloudinary){alert("أداة رفع الصور لم تجهز بعد. حاول مرة أخرى.");return}
+cloudinaryWidget=cloudinary.createUploadWidget({
+cloudName:CLOUDINARY_CLOUD_NAME,uploadPreset:CLOUDINARY_UPLOAD_PRESET,
+sources:["local","camera"],multiple:false,folder:"alwajha-menu",
+clientAllowedFormats:["jpg","jpeg","png","webp"],maxFileSize:6000000,
+showAdvancedOptions:false,cropping:false,theme:"minimal"
+},(error,result)=>{
+if(error){console.error(error);alert("تعذر رفع الصورة: "+(error.message||"خطأ غير معروف"));return}
+if(result.event==="success"&&result.info?.secure_url){$(targetId).value=result.info.secure_url}
+});
+cloudinaryWidget.open();
+}
+$("uploadHeroBtn").onclick=()=>openCloudinaryUpload("heroImage");
+$("uploadProductBtn").onclick=()=>openCloudinaryUpload("productImage");
+
 onAuthStateChanged(auth,async u=>{if(!u){$("authView").classList.remove("hidden");$("appView").classList.add("hidden");return}const a=await getDoc(doc(db,"admin",u.uid));if(!a.exists()||a.data().role!=="admin"){$("loginMessage").textContent="هذا الحساب لا يملك صلاحية مدير.";await signOut(auth);return}$("authView").classList.add("hidden");$("appView").classList.remove("hidden");await loadAll()});
 async function loadAll(){await Promise.all([loadSite(),loadCats(),loadProds()]);renderCats();renderProds();stats()}
 async function loadSite(){const s=await getDoc(doc(db,"settings","site")),x=s.exists()?s.data():{};$("siteName").value=x.name||"الواجهة البحرية";$("siteNameEn").value=x.nameEn||"AL WAJHA AL BAHRIYA";$("siteTagline").value=x.tagline||"في الواجهة البحرية، نصنع من الطعام تجربة، ومن كل زيارة ذكرى.";$("siteTaglineEn").value=x.taglineEn||"Where every meal becomes an experience and every visit becomes a memory.";$("heroImage").value=x.heroImage||"";$("sitePhone").value=x.phone||"";$("siteInstagram").value=x.instagram||"";$("siteLocation").value=x.location||""}
