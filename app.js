@@ -13,7 +13,7 @@ renderCats();renderProducts();
 
 function applySite(s){const n=s.name||"الواجهة البحرية",ne=s.nameEn||"AL WAJHA AL BAHRIYA",tag=s.tagline||"في الواجهة البحرية، نصنع من الطعام تجربة، ومن كل زيارة ذكرى.";
 $("restaurantName").textContent=n;$("restaurantNameEn").textContent=ne;$("brandMark").textContent=n;$("footerName").textContent=n;$("restaurantTagline").textContent=tag;$("footerDescription").textContent=tag;$("year").textContent=new Date().getFullYear();
-if(s.heroImage){const h=document.querySelector(".hero");h.style.backgroundImage=`linear-gradient(90deg,rgba(4,17,28,.94) 0%,rgba(4,17,28,.62) 43%,rgba(4,17,28,.18) 100%),linear-gradient(180deg,rgba(4,17,28,.1),rgba(4,17,28,.84)),url("${esc(s.heroImage)}")`;h.classList.add("has-image")}
+if(s.heroImage||true){const h=document.querySelector(".hero");const heroUrl=s.heroImage||"images/hero.jpg";h.style.backgroundImage=`linear-gradient(90deg,rgba(4,17,28,.94) 0%,rgba(4,17,28,.62) 43%,rgba(4,17,28,.18) 100%),linear-gradient(180deg,rgba(4,17,28,.1),rgba(4,17,28,.84)),url("${esc(heroUrl)}")`;h.classList.add("has-image")}
 if(s.phone){$("phoneLink").textContent=s.phone;$("phoneLink").href="tel:"+s.phone.replace(/\s/g,"");$("phoneLink").classList.remove("hidden")}if(s.instagram){$("instagramLink").href=s.instagram;$("instagramLink").classList.remove("hidden")}if(s.location){$("locationLink").href=s.location;$("locationLink").classList.remove("hidden")}}
 
 function renderCats(){const w=$("categories");w.innerHTML="";
