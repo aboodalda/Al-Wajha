@@ -13,9 +13,9 @@
 
 <header class="hero">
   <div class="hero-top">
-    <div class="hero-menu-mark">☰</div>
+    <button id="menuOpen" class="hero-icon-btn hero-menu-mark" type="button" aria-label="فتح قائمة الأقسام">☰</button>
     <div class="hero-language"><button id="langAr" class="lang-btn active">AR</button><span>|</span><button id="langEn" class="lang-btn">EN</button></div>
-    <div class="hero-search-icon">⌕</div>
+    <div class="hero-actions"><button id="themeToggle" class="hero-icon-btn" type="button" aria-label="تغيير الوضع">☀</button><button id="heroSearch" class="hero-icon-btn hero-search-icon" type="button" aria-label="البحث">⌕</button></div>
   </div>
   <div class="hero-content">
     <div class="brand-mark" id="brandMark">الواجهة البحرية</div>
@@ -28,6 +28,8 @@
   </div>
   <div class="scroll-hint">مرر للأسفل <span>↓</span></div>
 </header>
+
+<div id="menuDrawer" class="menu-drawer" aria-hidden="true"><div class="drawer-backdrop" id="drawerClose"></div><aside class="drawer-panel"><div class="drawer-head"><div><span class="drawer-kicker">MENU</span><h2 id="drawerTitle">أقسام المنيو</h2></div><button id="drawerX" class="drawer-close" type="button">×</button></div><div id="drawerCategories" class="drawer-categories"></div><div class="drawer-foot"><button id="drawerAll" type="button">عرض كل الأصناف</button></div></aside></div>
 
 <main id="menu" class="menu-shell">
   <section class="search-panel">
