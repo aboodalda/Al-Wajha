@@ -2,26 +2,67 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#071827"><title>الواجهة البحرية | المنيو</title>
+<meta name="theme-color" content="#071827"><meta name="description" content="الواجهة البحرية | قائمة الطعام">
+<title>الواجهة البحرية | المنيو</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
-<div id="loading" class="loading-screen"><div class="loader-ring"></div><p>جاري تحميل المنيو...</p></div>
-<header class="hero"><div class="hero-content">
-<div id="brandMark" class="brand-mark">الواجهة البحرية</div><p class="eyebrow">WELCOME TO</p>
-<h1 id="restaurantName">الواجهة البحرية</h1><p id="restaurantTagline">تجربة طعام استثنائية على البحر</p>
-<a class="gold-button" href="#menu">استكشف المنيو ↓</a>
-</div></header>
+<div id="loading" class="loading-screen"><div class="loader-ring"></div><p>جاري تجهيز تجربتك...</p></div>
+
+<header class="hero">
+  <div class="hero-top">
+    <div class="hero-menu-mark">☰</div>
+    <div class="hero-language"><button id="langAr" class="lang-btn active">AR</button><span>|</span><button id="langEn" class="lang-btn">EN</button></div>
+    <div class="hero-search-icon">⌕</div>
+  </div>
+  <div class="hero-content">
+    <div class="brand-mark" id="brandMark">الواجهة البحرية</div>
+    <p class="eyebrow" id="heroWelcome">WELCOME TO</p>
+    <h1 id="restaurantName">الواجهة البحرية</h1>
+    <div class="hero-en-name" id="restaurantNameEn">AL WAJHA AL BAHRIYA</div>
+    <p id="restaurantTagline">في الواجهة البحرية، نصنع من الطعام تجربة، ومن كل زيارة ذكرى.</p>
+    <div class="hero-ornament">〰〰〰</div>
+    <a class="gold-button" href="#menu" id="exploreButton">استكشف القائمة <span>↓</span></a>
+  </div>
+  <div class="scroll-hint">مرر للأسفل <span>↓</span></div>
+</header>
+
 <main id="menu" class="menu-shell">
-<section class="section-intro"><span class="gold-line"></span><p class="section-kicker">OUR MENU</p><h2>قائمة الطعام</h2><p class="section-description">اختر قسمك واستمتع بتجربة مميزة.</p></section>
-<div id="categories" class="category-tabs"></div><div id="products" class="products-grid"></div>
-<div id="emptyState" class="empty-state hidden">لا توجد منتجات متاحة حاليًا.</div>
+  <section class="search-panel">
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input id="menuSearch" type="search" autocomplete="off" placeholder="ابحث عن طبق، مشروب أو صنف..." aria-label="بحث في المنيو">
+      <button id="clearSearch" class="clear-search hidden" type="button" aria-label="مسح البحث">×</button>
+      <span class="search-filter">☷</span>
+    </div>
+  </section>
+
+  <section class="section-intro">
+    <span class="gold-line"></span>
+    <p class="section-kicker">OUR MENU</p>
+    <h2 id="menuTitle">قائمة الطعام</h2>
+    <p class="section-description" id="menuDescription">اختر قسمك واستمتع بتجربة مميزة.</p>
+  </section>
+
+  <div id="categories" class="category-tabs"></div>
+  <section class="featured-heading">
+    <div><span class="mini-wave">〰</span><h2 id="featuredTitle">أطباق مميزة</h2><span class="featured-en">FEATURED DISHES</span></div>
+    <button id="showAll" type="button">عرض الكل →</button>
+  </section>
+  <div id="products" class="products-grid"></div>
+  <div id="emptyState" class="empty-state hidden">لا توجد منتجات مطابقة لبحثك.</div>
 </main>
-<footer class="site-footer"><div id="footerName" class="footer-brand">الواجهة البحرية</div>
-<p id="footerDescription">تجربة طعام استثنائية على البحر</p><div class="footer-links">
-<a id="phoneLink" class="hidden"></a><a id="instagramLink" class="hidden" target="_blank" rel="noopener">Instagram</a><a id="locationLink" class="hidden" target="_blank" rel="noopener">الموقع</a>
-</div><small>© <span id="year"></span> الواجهة البحرية</small></footer>
-<script type="module" src="app.js?v=3"></script>
+
+<footer class="site-footer">
+  <div class="footer-wave">〰〰〰</div>
+  <div id="footerName" class="footer-brand">الواجهة البحرية</div>
+  <p id="footerDescription">في الواجهة البحرية، نصنع من الطعام تجربة، ومن كل زيارة ذكرى.</p>
+  <div class="footer-links">
+    <a id="phoneLink" class="hidden"></a><a id="instagramLink" class="hidden" target="_blank" rel="noopener">Instagram</a><a id="locationLink" class="hidden" target="_blank" rel="noopener">الموقع</a>
+  </div>
+  <small>© <span id="year"></span> الواجهة البحرية</small>
+</footer>
+<script type="module" src="app.js?v=5"></script>
 </body></html>
