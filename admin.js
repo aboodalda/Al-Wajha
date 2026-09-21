@@ -3,22 +3,22 @@ const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginMessage").textContent="جارٍ تسجيل الدخول...";try{await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value)}catch(x){$("loginMessage").textContent=errMsg(x)}};
 $("logoutBtn").onclick=()=>signOut(auth);
 const CLOUDINARY_CLOUD_NAME="heqkzarp",CLOUDINARY_UPLOAD_PRESET="alwajha";
-let cloudinaryWidget=null;
-function openCloudinaryUpload(targetId){
-if(!window.cloudinary){alert("أداة رفع الصور لم تجهز بعد. حاول مرة أخرى.");return}
-cloudinaryWidget=cloudinary.createUploadWidget({
-cloudName:CLOUDINARY_CLOUD_NAME,uploadPreset:CLOUDINARY_UPLOAD_PRESET,
-sources:["local","camera"],multiple:false,folder:"alwajha-menu",
-clientAllowedFormats:["jpg","jpeg","png","webp"],maxFileSize:6000000,
-showAdvancedOptions:false,cropping:false,theme:"minimal"
-},(error,result)=>{
-if(error){console.error(error);alert("تعذر رفع الصورة: "+(error.message||"خطأ غير معروف"));return}
-if(result.event==="success"&&result.info?.secure_url){$(targetId).value=result.info.secure_url}
-});
-cloudinaryWidget.open();
+async function uploadImage(file,targetId,button){
+if(!file)return;
+if(!file.type.startsWith("image/")){alert("يرجى اختيار صورة فقط.");return}
+if(file.size>6000000){alert("حجم الصورة يجب أن يكون أقل من 6MB.");return}
+const old=button.textContent;button.disabled=true;button.textContent="⏳ جاري رفع الصورة...";
+try{
+const form=new FormData();form.append("file",file);form.append("upload_preset",CLOUDINARY_UPLOAD_PRESET);form.append("folder","alwajha-menu");
+const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:"POST",body:form});
+const data=await res.json();if(!res.ok||!data.secure_url)throw new Error(data.error?.message||"تعذر رفع الصورة.");
+$(targetId).value=data.secure_url;
+}catch(e){console.error(e);alert("تعذر رفع الصورة: "+e.message)}finally{button.disabled=false;button.textContent=old}
 }
-$("uploadHeroBtn").onclick=()=>openCloudinaryUpload("heroImage");
-$("uploadProductBtn").onclick=()=>openCloudinaryUpload("productImage");
+$("uploadHeroBtn").onclick=()=>$("heroFile").click();
+$("uploadProductBtn").onclick=()=>$("productFile").click();
+$("heroFile").onchange=e=>{const f=e.target.files?.[0];uploadImage(f,"heroImage",$("uploadHeroBtn"));e.target.value=""};
+$("productFile").onchange=e=>{const f=e.target.files?.[0];uploadImage(f,"productImage",$("uploadProductBtn"));e.target.value=""};
 
 onAuthStateChanged(auth,async u=>{if(!u){$("authView").classList.remove("hidden");$("appView").classList.add("hidden");return}const a=await getDoc(doc(db,"admin",u.uid));if(!a.exists()||a.data().role!=="admin"){$("loginMessage").textContent="هذا الحساب لا يملك صلاحية مدير.";await signOut(auth);return}$("authView").classList.add("hidden");$("appView").classList.remove("hidden");await loadAll()});
 async function loadAll(){await Promise.all([loadSite(),loadCats(),loadProds()]);renderCats();renderProds();stats()}
