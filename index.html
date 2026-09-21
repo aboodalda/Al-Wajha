@@ -1,18 +1,27 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#071d2b">
-  <title>الواجهة البحرية | المنيو</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071827"><title>الواجهة البحرية | المنيو</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app"></div>
-  <script src="data.js"></script>
-  <script src="menu.js"></script>
-</body>
-</html>
+<div id="loading" class="loading-screen"><div class="loader-ring"></div><p>جاري تحميل المنيو...</p></div>
+<header class="hero"><div class="hero-content">
+<div id="brandMark" class="brand-mark">الواجهة البحرية</div><p class="eyebrow">WELCOME TO</p>
+<h1 id="restaurantName">الواجهة البحرية</h1><p id="restaurantTagline">تجربة طعام استثنائية على البحر</p>
+<a class="gold-button" href="#menu">استكشف المنيو ↓</a>
+</div></header>
+<main id="menu" class="menu-shell">
+<section class="section-intro"><span class="gold-line"></span><p class="section-kicker">OUR MENU</p><h2>قائمة الطعام</h2><p class="section-description">اختر قسمك واستمتع بتجربة مميزة.</p></section>
+<div id="categories" class="category-tabs"></div><div id="products" class="products-grid"></div>
+<div id="emptyState" class="empty-state hidden">لا توجد منتجات متاحة حاليًا.</div>
+</main>
+<footer class="site-footer"><div id="footerName" class="footer-brand">الواجهة البحرية</div>
+<p id="footerDescription">تجربة طعام استثنائية على البحر</p><div class="footer-links">
+<a id="phoneLink" class="hidden"></a><a id="instagramLink" class="hidden" target="_blank" rel="noopener">Instagram</a><a id="locationLink" class="hidden" target="_blank" rel="noopener">الموقع</a>
+</div><small>© <span id="year"></span> الواجهة البحرية</small></footer>
+<script type="module" src="app.js"></script>
+</body></html>
