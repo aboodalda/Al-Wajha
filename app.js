@@ -7,7 +7,7 @@ let liveStarted=false,liveUnsubs=[];
 function load(){if(liveStarted)return;liveStarted=true;applyTheme();const settingsRef=doc(db,"settings","site");
 liveUnsubs.push(onSnapshot(settingsRef,s=>{state.site=s.exists()?s.data():{};applySite(state.site);setLang(state.lang)},e=>console.error("settings listener",e)));
 liveUnsubs.push(onSnapshot(query(collection(db,"categories"),orderBy("order","asc")),s=>{state.categories=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.visible!==false);renderCats();renderDrawer();renderProducts()},e=>showLiveError(e)));
-liveUnsubs.push(onSnapshot(query(collection(db,"products"),orderBy("order","asc")),s=>{state.products=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.visible!==false);renderProducts()},e=>showLiveError(e)));
+liveUnsubs.push(onSnapshot(query(collection(db,"products"),orderBy("order","asc")),s=>{state.products=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.visible!==false&&state.categories.some(c=>c.id===x.categoryId));renderProducts()},e=>showLiveError(e)));
 setTimeout(()=>{$("loading").style.display="none"},700)}
 function showLiveError(e){console.error(e);if(!state.products.length)$("emptyState").textContent="تعذر تحميل المنيو. تأكد من إعدادات Firebase."}
 function applySite(s){const n=s.name||"الواجهة البحرية",ne=s.nameEn||"AL WAJHA AL BAHRIYA",tag=s.tagline||"في الواجهة البحرية، نصنع من الطعام تجربة، ومن كل زيارة ذكرى.";
