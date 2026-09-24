@@ -33,14 +33,80 @@ function cartTotal(){return state.cart.reduce((sum,x)=>sum+(Number(x.price)||0)*
 function orderNumber(){if(state.currentOrderNumber)return state.currentOrderNumber;const d=new Date(),pad=n=>String(n).padStart(2,"0");state.currentOrderNumber="WA-"+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+"-"+pad(d.getHours())+pad(d.getMinutes())+pad(d.getSeconds());return state.currentOrderNumber}
 function cartOfferRefresh(){let changed=false;state.cart=state.cart.map(x=>{const p=state.products.find(v=>v.id===x.id);if(!p)return x;const current=offerIsActive(p)?Number(p.offerPrice):Number(p.price||0);if(current!==Number(x.price)){changed=true;return {...x,price:current}}return x}).filter(x=>{const p=state.products.find(v=>v.id===x.id);return p&&p.visible!==false});if(changed)cartSave()}
 
-function addToCart(p,qty=1){const price=offerIsActive(p)?Number(p.offerPrice):Number(p.price||0);const found=state.cart.find(x=>x.id===p.id&&x.price===price);if(found)found.qty+=qty;else state.cart.push({id:p.id,name:p.name||"منتج",nameEn:p.nameEn||"",price,imageUrl:p.imageUrl||"",qty});cartSave();showCartToast("تمت الإضافة إلى السلة ✓");renderCart()}
+function addToCart(p,qty=1){const price=offerIsActive(p)?Number(p.offerPrice):Number(p.price||0);const found=state.cart.find(x=>x.id===p.id&&x.price===price);if(found)found.qty+=qty;else state.cart.push({id:p.id,name:p.name||"منتج",nameEn:p.nameEn||"",categoryId:p.categoryId||"",price,imageUrl:p.imageUrl||"",qty});cartSave();showCartToast("تمت الإضافة إلى السلة ✓");renderCart()}
 function changeCartQty(id,delta){const x=state.cart.find(v=>v.id===id);if(!x)return;x.qty+=delta;if(x.qty<=0)state.cart=state.cart.filter(v=>v.id!==id);cartSave();renderCart()}
 function removeCart(id){state.cart=state.cart.filter(v=>v.id!==id);cartSave();renderCart()}
 function updateCartCount(){const n=state.cart.reduce((s,x)=>s+x.qty,0);const label=n>99?"99+":n;const b=$("cartCount");if(b)b.textContent=label;let f=$("floatingCart");if(!f){f=document.createElement("button");f.id="floatingCart";f.type="button";f.className="floating-cart";f.setAttribute("aria-label","فتح السلة");f.innerHTML="<span class=\"floating-cart-icon\">🛒</span><span class=\"floating-cart-label\">السلة</span><span class=\"floating-cart-count\">0</span>";f.onclick=openCart;document.body.appendChild(f)}f.querySelector(".floating-cart-count").textContent=label;f.classList.toggle("show",n>0)}
 function showCartToast(msg){let t=$("cartToast");if(!t){t=document.createElement("div");t.id="cartToast";t.className="cart-toast";t.innerHTML="<div></div>";document.body.appendChild(t)}t.firstElementChild.textContent=msg;t.classList.add("show");clearTimeout(window.__cartToast);window.__cartToast=setTimeout(()=>t.classList.remove("show"),1800)}
 function ensureCart(){if($("cartModal"))return;const m=document.createElement("div");m.id="cartModal";m.className="cart-modal";m.setAttribute("aria-hidden","true");m.innerHTML='<div class="cart-modal-backdrop" data-cart-close></div><section class="cart-panel" role="dialog" aria-modal="true" aria-labelledby="cartTitle"><div class="cart-head"><div><span class="cart-kicker">YOUR ORDER</span><h2 id="cartTitle">سلة الطلب</h2></div><button class="cart-close" type="button" data-cart-close>×</button></div><div id="cartItems" class="cart-items"></div><div class="cart-tools"><button id="clearCartBtn" type="button">🧹 تفريغ السلة</button><button id="copyOrderBtn" type="button">📋 نسخ الطلب</button></div><div id="cartTotal" class="cart-total"><span>الإجمالي</span><strong>0 ر.س</strong></div><div class="order-form"><label>الاسم<input id="orderName" autocomplete="name" placeholder="اسمك"></label><label>رقم الهاتف <span>(اختياري)</span><input id="orderPhone" type="tel" autocomplete="tel" placeholder="05xxxxxxxx"></label><label>رقم الطاولة <span>(اختياري)</span><input id="orderTable" inputmode="numeric" placeholder="مثال: 12"></label><label>ملاحظات الطلب <span>(اختياري)</span><textarea id="orderNotes" placeholder="مثلاً: بدون بصل، عصير بدون سكر..."></textarea></label><button id="whatsappOrder" class="whatsapp-order" type="button">💬 إرسال الطلب عبر WhatsApp</button></div></section></div>';document.body.appendChild(m);m.querySelectorAll("[data-cart-close]").forEach(b=>b.addEventListener("click",closeCart));$("cartButton").onclick=openCart;$("whatsappOrder").onclick=sendWhatsAppOrder;$("clearCartBtn").onclick=clearCart;$("copyOrderBtn").onclick=copyOrderText;updateCartCount();renderCart()}
 function clearCart(){if(!state.cart.length)return;if(!confirm("تفريغ السلة بالكامل؟"))return;state.cart=[];state.currentOrderNumber=null;cartSave();renderCart();showCartToast("تم تفريغ السلة")}
-function orderText(){const name=$("orderName")?.value.trim()||"",customerPhone=$("orderPhone")?.value.trim()||"",table=$("orderTable")?.value.trim()||"",notes=$("orderNotes")?.value.trim()||"",num=orderNumber(),lines=state.cart.map((x,i)=>`${i+1}. ${x.name} × ${x.qty} — ${(x.price*x.qty).toLocaleString("ar-SA")} ر.س`);return ["طلب جديد — الواجهة البحرية","رقم الطلب: "+num,"",...lines,"","الإجمالي: "+cartTotal().toLocaleString("ar-SA")+" ر.س",name?"الاسم: "+name:"",customerPhone?"الهاتف: "+customerPhone:"",table?"الطاولة: "+table:"",notes?"ملاحظات: "+notes:""].filter(Boolean).join("\n")}
+function orderCategoryIcon(c){
+  const custom=String(c?.icon||"").trim();
+  if(custom&&custom!=="◈")return custom;
+  const n=String(c?.name||"").toLowerCase();
+  if(/مشروب|عصير|قهوة|شاي|بارد|ساخن/.test(n))return"🥤";
+  if(/حلويات|حلو|كيك|كنافة|كريب/.test(n))return"🍰";
+  if(/بيتزا/.test(n))return"🍕";
+  if(/برجر|برغر|ساندويتش|سندوتش/.test(n))return"🍔";
+  if(/دجاج|شيش|مشاوي|مشوي|لحوم|لحمة/.test(n))return"🍗";
+  if(/سلطة|سلطات/.test(n))return"🥗";
+  if(/فطور|إفطار/.test(n))return"🍳";
+  if(/بحر|سمك|أسماك|مأكولات بحرية/.test(n))return"🐟";
+  return"🍽️"
+}
+function orderText(){
+  const name=$("orderName")?.value.trim()||"",
+        customerPhone=$("orderPhone")?.value.trim()||"",
+        table=$("orderTable")?.value.trim()||"",
+        notes=$("orderNotes")?.value.trim()||"",
+        num=orderNumber(),
+        money=v=>Number(v||0).toLocaleString("ar-SA")+" ر.س",
+        groups=new Map();
+  state.cart.forEach(x=>{
+    const p=state.products.find(v=>v.id===x.id),
+          categoryId=x.categoryId||p?.categoryId||"__other",
+          category=state.categories.find(c=>c.id===categoryId);
+    if(!groups.has(categoryId))groups.set(categoryId,{category,items:[]});
+    groups.get(categoryId).items.push({...x,product:p})
+  });
+  const sections=[];
+  const ordered=[...state.categories.map(c=>c.id),...groups.keys()].filter((id,i,a)=>a.indexOf(id)===i);
+  ordered.forEach(categoryId=>{
+    const g=groups.get(categoryId);
+    if(!g)return;
+    const title=g.category?.name||"أصناف متنوعة",
+          icon=orderCategoryIcon(g.category);
+    sections.push("┏━━━━━━━━━━━━━━━━━━┓");
+    sections.push(icon+"  "+title);
+    sections.push("┗━━━━━━━━━━━━━━━━━━┛");
+    g.items.forEach((x,i)=>{
+      const total=(Number(x.price)||0)*(Number(x.qty)||1);
+      sections.push("• "+x.name+" × "+x.qty+"  —  "+money(total))
+    })
+  });
+  return [
+    "🌊✨ الواجهة البحرية ✨🌊",
+    "🧾 طلب جديد",
+    "━━━━━━━━━━━━━━━━━━━━",
+    "🔖 رقم الطلب: "+num,
+    "",
+    "🍽️ تفاصيل الطلب",
+    ...sections,
+    "",
+    "━━━━━━━━━━━━━━━━━━━━",
+    "💰 الإجمالي النهائي: "+money(cartTotal()),
+    "",
+    "👤 بيانات العميل",
+    name?"• الاسم: "+name:"",
+    customerPhone?"• الهاتف: "+customerPhone:"",
+    table?"• الطاولة: "+table:"",
+    notes?"• ملاحظات: "+notes:"",
+    "",
+    "━━━━━━━━━━━━━━━━━━━━",
+    "🙏 شكرًا لاختياركم الواجهة البحرية",
+    "✨ نتمنى لكم تجربة شهية ومميزة ✨"
+  ].filter(Boolean).join("\n")
+}
 async function copyOrderText(){if(!state.cart.length)return;try{await navigator.clipboard.writeText(orderText());showCartToast("تم نسخ تفاصيل الطلب 📋")}catch(e){showCartToast("تعذر نسخ الطلب")}}
 function renderCart(){cartOfferRefresh();const w=$("cartItems"),t=$("cartTotal"),btn=$("whatsappOrder");if(!w)return;if(!state.cart.length){w.innerHTML='<div class="cart-empty">السلة فارغة حاليًا.<br>أضف الأصناف التي تريد طلبها من تفاصيل المنتج.</div>';t.innerHTML="<span>الإجمالي</span><strong>0 ر.س</strong>";btn.disabled=true;return}btn.disabled=false;w.innerHTML=state.cart.map(x=>'<div class="cart-item">'+(x.imageUrl?'<img class="cart-item-img" src="'+esc(optimizeImage(x.imageUrl,180))+'" alt="">':'<div class="cart-item-img"></div>')+'<div class="cart-item-info"><div class="cart-item-name">'+esc(state.lang==="ar"?x.name:(x.nameEn||x.name))+'</div><div class="cart-item-price">'+Number(x.price).toLocaleString(state.lang==="ar"?"ar-SA":"en-US")+' ر.س × '+x.qty+'</div></div><div class="cart-item-actions"><button class="qty-btn" data-cqty="'+x.id+'" data-d="-1">−</button><span class="qty-num">'+x.qty+'</span><button class="qty-btn" data-cqty="'+x.id+'" data-d="1">+</button><button class="cart-remove" data-rm="'+x.id+'" aria-label="حذف">×</button></div></div>').join("");w.querySelectorAll("[data-cqty]").forEach(b=>b.onclick=()=>changeCartQty(b.dataset.cqty,Number(b.dataset.d)));w.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>removeCart(b.dataset.rm));t.innerHTML='<span>الإجمالي</span><strong>'+cartTotal().toLocaleString(state.lang==="ar"?"ar-SA":"en-US")+' ر.س</strong>'}
 function showOrderSuccess(){let s=$("orderSuccess");if(!s){s=document.createElement("div");s.id="orderSuccess";s.className="order-success";s.innerHTML='<div class="order-success-card"><div class="success-icon">✓</div><h3>تم تجهيز طلبك</h3><p>تم فتح WhatsApp لإرسال الطلب للمطعم.</p><span>احتفظ برقم الطلب الظاهر في الرسالة.</span><button type="button" id="successClose">حسنًا</button></div>';document.body.appendChild(s);s.querySelector("#successClose").onclick=()=>s.remove()}s.classList.add("show")}
