@@ -35,7 +35,7 @@ body.light-theme .site-footer{color:#66727a;border-color:rgba(123,90,32,.15)}bod
 /* Cart + WhatsApp ordering */
 .cart-top-btn{position:relative;font-size:17px!important}
 .cart-count{position:absolute;top:-5px;right:-4px;min-width:18px;height:18px;padding:0 4px;display:grid;place-items:center;border-radius:999px;background:#f4d993;color:#071827;font-size:9px;font-weight:900;border:2px solid #071827;box-shadow:0 4px 12px rgba(0,0,0,.35)}
-.cart-toast{position:fixed;right:16px;left:16px;bottom:18px;z-index:160;display:flex;justify-content:center;pointer-events:none;transform:translateY(20px);opacity:0;transition:.3s}
+.cart-toast{position:fixed;top:18px;right:16px;left:16px;z-index:260;display:flex;justify-content:center;pointer-events:none;transform:translateY(-16px) scale(.98);opacity:0;transition:.3s}
 .cart-toast.show{transform:none;opacity:1}
 .cart-toast>div{background:rgba(4,21,34,.96);border:1px solid rgba(244,217,147,.4);color:#f7dda0;border-radius:999px;padding:11px 18px;box-shadow:0 15px 45px #0007;backdrop-filter:blur(14px);font-size:12px;font-weight:800}
 .cart-modal{position:fixed;inset:0;z-index:150;display:grid;place-items:end center;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .28s ease}
@@ -65,3 +65,14 @@ body.light-theme .site-footer{color:#66727a;border-color:rgba(123,90,32,.15)}bod
 .order-success{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:20px;background:rgba(0,7,13,.78);backdrop-filter:blur(12px);opacity:0;visibility:hidden;transition:.25s}.order-success.show{opacity:1;visibility:visible}.order-success-card{width:min(390px,100%);text-align:center;background:linear-gradient(150deg,#0e3349,#061a29);border:1px solid rgba(244,217,147,.3);border-radius:24px;padding:30px 22px;box-shadow:0 25px 90px #000a}.success-icon{width:62px;height:62px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#6be7a0,#22b968);color:#062217;font-size:30px;font-weight:900;box-shadow:0 12px 35px #20b96644}.order-success-card h3{color:#f6d997;margin:0 0 8px;font-size:20px}.order-success-card p{color:#d4e0e4;font-size:12px;margin:0 0 7px}.order-success-card span{color:#8ea2ad;font-size:10px}.order-success-card button{margin-top:18px;width:100%;border:0;border-radius:12px;background:#f4d993;color:#071827;padding:11px;font-weight:900;cursor:pointer}
 @media(max-width:599px){.cart-tools{position:sticky;bottom:0;background:linear-gradient(transparent,#061a2a 35%);padding-top:10px}}
 .light-theme .order-success-card{background:linear-gradient(150deg,#fffdf8,#eee9df)}.light-theme .order-success-card p{color:#42545c}
+
+/* Quick add + floating cart */
+.dish-plus{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border:1px solid rgba(244,217,147,.35);border-radius:12px;background:linear-gradient(145deg,#f4d993,#cfa453);color:#071827;font-size:24px;line-height:1;font-weight:900;cursor:pointer;box-shadow:0 8px 22px rgba(214,173,97,.18);transition:transform .18s,box-shadow .18s,filter .18s;padding:0}
+.dish-plus:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 12px 28px rgba(214,173,97,.28);filter:brightness(1.05)}
+.dish-plus:active{transform:scale(.92)}
+.floating-cart{position:fixed;left:50%;bottom:18px;transform:translate(-50%,20px) scale(.92);z-index:145;display:flex;align-items:center;gap:8px;padding:10px 15px 10px 11px;border:1px solid rgba(244,217,147,.48);border-radius:999px;background:linear-gradient(135deg,rgba(13,48,71,.98),rgba(4,21,34,.98));color:#f8dda0;box-shadow:0 14px 45px rgba(0,0,0,.45),0 0 0 1px rgba(244,217,147,.05);backdrop-filter:blur(16px);opacity:0;visibility:hidden;pointer-events:none;transition:.28s cubic-bezier(.16,.8,.2,1);font-weight:900;font-size:12px;cursor:pointer}
+.floating-cart.show{transform:translate(-50%,0) scale(1);opacity:1;visibility:visible;pointer-events:auto}
+.floating-cart-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:#f4d993;color:#071827;font-size:16px}
+.floating-cart-count{min-width:22px;height:22px;padding:0 6px;display:grid;place-items:center;border-radius:999px;background:#c94e4e;color:#fff;font-size:10px}
+.light-theme .floating-cart{background:linear-gradient(135deg,rgba(255,253,248,.98),rgba(238,233,223,.98));color:#765722;border-color:rgba(123,90,32,.3)}
+@media(max-width:599px){.cart-toast{top:12px;right:10px;left:10px}.cart-toast>div{padding:10px 16px}.floating-cart{bottom:14px}}
