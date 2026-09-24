@@ -1,0 +1,72 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admin/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admin/$(request.auth.uid)).data.role == "admin";
+    }
+
+    match /settings/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /categories/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /products/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /admin/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /orders/{orderId} {
+      allow create: if
+        request.resource.data.keys().hasOnly([
+          "orderNumber",
+          "items",
+          "total",
+          "customer",
+          "status",
+          "source",
+          "createdAt"
+        ])
+        && request.resource.data.orderNumber is string
+        && request.resource.data.orderNumber.size() >= 10
+        && request.resource.data.orderNumber.size() <= 40
+        && request.resource.data.items is list
+        && request.resource.data.items.size() >= 1
+        && request.resource.data.items.size() <= 50
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0
+        && request.resource.data.customer is map
+        && request.resource.data.customer.keys().hasOnly([
+          "name",
+          "phone",
+          "table",
+          "notes"
+        ])
+        && request.resource.data.customer.name is string
+        && request.resource.data.customer.name.size() <= 120
+        && request.resource.data.customer.phone is string
+        && request.resource.data.customer.phone.size() <= 40
+        && request.resource.data.customer.table is string
+        && request.resource.data.customer.table.size() <= 20
+        && request.resource.data.customer.notes is string
+        && request.resource.data.customer.notes.size() <= 500
+        && request.resource.data.status == "new"
+        && request.resource.data.source == "whatsapp";
+
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
