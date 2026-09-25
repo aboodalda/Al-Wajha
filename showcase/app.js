@@ -29,9 +29,12 @@ form.addEventListener("submit",e=>{
     "━━━━━━━━━━━━━━━━",
     "أريد معرفة السعر والتفاصيل."
   ].filter(Boolean).join("\n");
-  navigator.clipboard?.writeText(message).catch(()=>{});
+  const whatsappNumber="970592936150";
+  const whatsappUrl="https://wa.me/"+whatsappNumber+"?text="+encodeURIComponent(message);
   const button=form.querySelector("button");
   const old=button.textContent;
-  button.textContent="✓ تم نسخ رسالة الطلب";
-  setTimeout(()=>{button.textContent=old;closeModal()},1800);
+  button.textContent="✓ جاري فتح WhatsApp...";
+  button.disabled=true;
+  window.open(whatsappUrl,"_blank","noopener");
+  setTimeout(()=>{button.textContent=old;button.disabled=false;closeModal()},900);
 });
